@@ -16,6 +16,7 @@
  */
 
 package com.chess.engine.board;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,7 +25,7 @@ import com.chess.engine.pieces.Piece;
 public abstract class Tile {
     protected final int tileCoordinate;
 
-    private static final Map<Integer, emptyTile> EMPTY_TILES = createAllPossibleEmptyTiles();
+    private static final Map<Integer, emptyTile> EMPTY_TILES_CACHE = createAllPossibleEmptyTiles();
 
     private static Map<Integer, emptyTile> createAllPossibleEmptyTiles(){
         final Map<Integer, emptyTile> emptyTileMap = new HashMap<>();
@@ -33,11 +34,12 @@ public abstract class Tile {
             emptyTileMap.put(i, new emptyTile(i));
         }
 
+        Collections.unmodifiableMap(emptyTileMap);
         return emptyTileMap;
     }
 
     public static Tile createTile(final int tileCoordinate, final Piece piece){
-        return piece != null ? new occupiedTile(tileCoordinate, piece) : EMPTY_TILES.get(tileCoordinate);
+        return piece != null ? new occupiedTile(tileCoordinate, piece) : EMPTY_TILES_CACHE.get(tileCoordinate);
     }
 
     private Tile(int tileCoordinate){
@@ -55,7 +57,7 @@ public abstract class Tile {
      *  We extends Tile to achive polymorphism, allowing diffrent tile types to behave differently while sharing a common interface.
      */
     public static final class emptyTile extends Tile{
-        emptyTile(final int tileCoordinate){
+        private emptyTile(final int tileCoordinate){
             super(tileCoordinate); //calls the Tile's constructor to set the tileCoordinate
         }
 
@@ -76,7 +78,7 @@ public abstract class Tile {
     public static final class occupiedTile extends Tile{
         private final Piece pieceOnTile;
 
-        occupiedTile(int tileCoordinate, Piece pieceOnTile) {
+        private occupiedTile(int tileCoordinate, Piece pieceOnTile) {
             super(tileCoordinate); //calls the Tile's constructor to set the tileCoordinate
             this.pieceOnTile = pieceOnTile;
         }
