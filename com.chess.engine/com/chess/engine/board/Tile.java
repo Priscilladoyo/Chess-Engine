@@ -11,12 +11,36 @@
  *      return null; //default to 'no piece'
  * }
  * 
+ * 'protected' keyword used for immutability so it can only be accessed by a subclasses.
+ * 
  */
 
-public abstract class Tile {
-    int tileCoordinate;
+package com.chess.engine.board;
+import java.util.HashMap;
+import java.util.Map;
 
-    Tile(int tileCoordinate){
+import com.chess.engine.pieces.Piece;
+
+public abstract class Tile {
+    protected final int tileCoordinate;
+
+    private static final Map<Integer, emptyTile> EMPTY_TILES = createAllPossibleEmptyTiles();
+
+    private static Map<Integer, emptyTile> createAllPossibleEmptyTiles(){
+        final Map<Integer, emptyTile> emptyTileMap = new HashMap<>();
+
+        for(int i = 0; i < 64; i++){
+            emptyTileMap.put(i, new emptyTile(i));
+        }
+
+        return emptyTileMap;
+    }
+
+    public static Tile createTile(final int tileCoordinate, final Piece piece){
+        return piece != null ? new occupiedTile(tileCoordinate, piece) : EMPTY_TILES.get(tileCoordinate);
+    }
+
+    private Tile(int tileCoordinate){
         this.tileCoordinate = tileCoordinate;
     }
 
@@ -25,13 +49,13 @@ public abstract class Tile {
     public abstract Piece getPiece();
 
     /* 
-     * 'final' keyword means that these classes cannot be subclassed further.
+     * 'final' keyword means that these classes cannot be subclassed further (set it once).
      *  This helps lock down the design and reinforces that a Tile is either empty or occupied - nothing more.
      * 
      *  We extends Tile to achive polymorphism, allowing diffrent tile types to behave differently while sharing a common interface.
      */
     public static final class emptyTile extends Tile{
-        emptyTile(int tileCoordinate){
+        emptyTile(final int tileCoordinate){
             super(tileCoordinate); //calls the Tile's constructor to set the tileCoordinate
         }
 
@@ -46,8 +70,11 @@ public abstract class Tile {
         }
     }
 
+    /* 
+     * 'private' keyword means we can't call pieceOnTile outside this method without getPiece() on it.
+    */
     public static final class occupiedTile extends Tile{
-        Piece pieceOnTile;
+        private final Piece pieceOnTile;
 
         occupiedTile(int tileCoordinate, Piece pieceOnTile) {
             super(tileCoordinate); //calls the Tile's constructor to set the tileCoordinate

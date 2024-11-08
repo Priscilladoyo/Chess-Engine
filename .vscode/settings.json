@@ -1,0 +1,8 @@
+{
+    "java.project.sourcePaths": [
+        "com.chess.engine"
+    ],
+    "java.project.referencedLibraries": [
+        "/Users/priscillahandoyo/guava-32.1.2-jre.jar"
+    ]
+}
